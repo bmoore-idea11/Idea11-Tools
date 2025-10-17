@@ -1,14 +1,12 @@
-#!/usr/bin/env python3
 import pyarrow.orc as orc
-import argparse
 import os
-import sys
 import yaml
 import pandas as pd
 
+
 def safe_convert(value):
     """Convert complex types (like Timestamps, Decimals) into strings for YAML output."""
-    if isinstance(value, (pd.Timestamp,)):
+    if isinstance(value, pd.Timestamp):
         return value.isoformat()
     elif isinstance(value, (bytes, bytearray)):
         return value.decode(errors="replace")
@@ -17,19 +15,29 @@ def safe_convert(value):
     else:
         return str(value)
 
-def convert_orc_to_yaml(input_path, output_path=None):
-    """Reads an ORC file and writes it as a YAML file."""
+
+def convert_orc_to_yaml(input_path: str, output_path: str | None = None) -> str:
+    """
+    Convert an ORC file to a YAML file.
+
+    Args:
+        input_path (str): Path to the input ORC file.
+        output_path (str, optional): Path to the output YAML file. Defaults to same name as input with `.yaml`.
+
+    Returns:
+        str: Path to the generated YAML file.
+
+    Raises:
+        FileNotFoundError: If the input file does not exist.
+        RuntimeError: If reading or writing fails.
+    """
     if not os.path.exists(input_path):
-        print(f"❌ Error: File not found: {input_path}")
-        sys.exit(1)
+        raise FileNotFoundError(f"Input file not found: {input_path}")
 
     try:
-        print(f"📥 Reading ORC file: {input_path}")
         table = orc.read_table(input_path)
-        print(f"✅ Successfully read ORC file with {table.num_rows} rows and {table.num_columns} columns.")
     except Exception as e:
-        print(f"❌ Failed to read ORC file: {e}")
-        sys.exit(1)
+        raise RuntimeError(f"Failed to read ORC file: {e}")
 
     if not output_path:
         output_path = os.path.splitext(input_path)[0] + ".yaml"
@@ -44,7 +52,6 @@ def convert_orc_to_yaml(input_path, output_path=None):
             for record in records
         ]
 
-        print(f"💾 Writing to YAML: {output_path}")
         with open(output_path, "w", encoding="utf-8") as f:
             yaml.safe_dump(
                 safe_records,
@@ -54,18 +61,8 @@ def convert_orc_to_yaml(input_path, output_path=None):
                 default_flow_style=False,
                 width=120,
             )
-        print(f"🎉 Conversion complete: {output_path}")
+
     except Exception as e:
-        print(f"❌ Failed to write YAML: {e}")
-        sys.exit(1)
+        raise RuntimeError(f"Failed to write YAML: {e}")
 
-def main():
-    parser = argparse.ArgumentParser(description="Convert ORC file to readable YAML using PyArrow.")
-    parser.add_argument("input", help="Path to the input ORC file.")
-    parser.add_argument("-o", "--output", help="Optional path for the output YAML file.")
-    args = parser.parse_args()
-
-    convert_orc_to_yaml(args.input, args.output)
-
-if __name__ == "__main__":
-    main()
+    return output_path

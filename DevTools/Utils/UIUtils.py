@@ -1,5 +1,7 @@
 import os
 import platform
+import time
+
 
 class ColorUi:
     RESET = "\033[0m"
@@ -99,25 +101,76 @@ class UiUtils:
     developmentVersion = 1.1
 
     @staticmethod
-    def MainMenu(commands=None, title="Main Menu"):
+    def logo():
+        a = ColorUi.colorize("<", ColorUi.DeepPurple, bold=True)
+        b = ColorUi.colorize("PerlsDeveloperTools", ColorUi.Violet, bold=True)
+        c = ColorUi.colorize(">", ColorUi.DeepPurple, bold=True)
+        return f"{a}{b}{c}"
+    
+    @staticmethod
+    def error():
+        a = ColorUi.colorize("<", ColorUi.DeepPurple, bold=True)
+        b = ColorUi.colorize("ERROR", ColorUi.Red, bold=True)
+        c = ColorUi.colorize(">", ColorUi.DeepPurple, bold=True)
+        return f"{a}{b}{c}"
+    
+    @staticmethod
+    def working():
+        a = ColorUi.colorize("<", ColorUi.DeepPurple, bold=True)
+        b = ColorUi.colorize("WORKING", ColorUi.Blue, bold=True)
+        c = ColorUi.colorize(">", ColorUi.DeepPurple, bold=True)
+        return f"{a}{b}{c}"
+    
+    @staticmethod
+    def success():
+        a = ColorUi.colorize("<", ColorUi.DeepPurple, bold=True)
+        b = ColorUi.colorize("SUCCESS", ColorUi.Gold, bold=True)
+        c = ColorUi.colorize(">", ColorUi.DeepPurple, bold=True)
+        return f"{a}{b}{c}"
+    
+    @staticmethod
+    def input():
+        a = ColorUi.colorize("<", ColorUi.DeepPurple, bold=True)
+        b = ColorUi.colorize("INPUT", ColorUi.Green, bold=True)
+        c = ColorUi.colorize(">", ColorUi.DeepPurple, bold=True)
+        return f"{a}{b}{c}"
+    
+
+    @staticmethod
+    def MenuFactory(commands=None, title="Main Menu"):
+        """Render a colorized boxed menu with a lighter purple title accent."""
         if commands is None:
             commands = [
-                ("1", "Convert ORC → YAML"),
-                ("2", "Convert CSV → JSON (coming soon)"),
+                ("1", "Data Tools"),
+                ("2", "Network Tools"),
                 ("3", "Exit"),
             ]
 
         print()
+       
         ColorUi.print_multi(
-            (f"╔══════════ {title} ══════════╗", ColorUi.NeonPurple, True)
+            ("╔══════════ ", ColorUi.NeonPurple, True),
+            (title, ColorUi.Lavender, True, False, True),  
+            (" ═════════╗", ColorUi.NeonPurple, True),
         )
+
+        # Menu options
         for key, desc in commands:
             ColorUi.print_multi(
                 ("║ ", ColorUi.DeepPurple, True),
                 (f"{key}. ", ColorUi.Lavender, True),
-                (desc, ColorUi.BrightMagenta if "soon" in desc.lower() else ColorUi.Violet, True),
+                (
+                    desc,
+                    ColorUi.BrightMagenta if "soon" in desc.lower() else ColorUi.Violet,
+                    True,
+                ),
             )
-        ColorUi.print_multi(("╚══════════════════════════════╝", ColorUi.NeonPurple, True))
+
+        # Bottom border
+        ColorUi.print_multi(
+            ("╚══════════════════════════════╝", ColorUi.NeonPurple, True)
+        )
+
 
     @staticmethod
     def PrntBanner():
@@ -144,3 +197,38 @@ class UiUtils:
     @staticmethod
     def clear_screen():
         os.system("cls" if platform.system() == "Windows" else "clear")
+        
+    def menu_data():
+        while True:
+            UiUtils.clear_screen()
+            UiUtils.PrntBanner()
+            UiUtils.MenuFactory(
+                [
+                    ("1", "ORC → YAML Converter"),
+                    ("2", "Back to Main Menu"),
+                ],
+                title="Data Menu",
+            )
+            choice = input(ColorUi.colorize("\nChoice: ", ColorUi.BrightWhite, bold=True)).strip()
+            if choice == "1":
+                return 1
+            elif choice == "2":
+                return 2
+
+
+    def menu_network():
+        while True:
+            UiUtils.clear_screen()
+            UiUtils.PrntBanner()
+            UiUtils.MenuFactory(
+                [
+                    ("1", "Port Scanner"),
+                    ("2", "Back to Main Menu"),
+                ],
+                title="Network Menu",
+            )
+            choice = input(ColorUi.colorize("\nChoice: ", ColorUi.BrightWhite, bold=True)).strip()
+            if choice == "1":
+                return 1
+            elif choice == "2":
+                return 2

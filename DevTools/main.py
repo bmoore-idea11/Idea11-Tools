@@ -7,7 +7,7 @@ from Utils import portscan
 from Utils.UIUtils import UiUtils, ColorUi
 from Utils.path_selector import select_path
 from Utils.orc_to_yaml import convert_orc_to_yaml
-
+from Utils.master_converter import run_master_converter_interactive
 
 
 # Keep readline import if you need it in other modules
@@ -69,6 +69,8 @@ def interactive_app():
             _selectionData = UiUtils.menu_data()
             if _selectionData == 1:
                 handle_orc_to_yaml()
+            if _selectionData == 2:
+                run_master_converter_interactive()
         elif choice == "2":
             _selection = UiUtils.menu_network()
             if _selection == 1:
